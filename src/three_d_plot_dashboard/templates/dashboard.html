@@ -1,0 +1,2952 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>__PAGE_TITLE__</title>
+    <script src="__PLOTLY_SOURCE__"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+      :root {
+        --bg: #09131f;
+        --bg-deep: #060c14;
+        --panel: rgba(13, 23, 37, 0.8);
+        --panel-strong: rgba(16, 30, 48, 0.94);
+        --line: rgba(117, 150, 186, 0.2);
+        --text: #edf5ff;
+        --muted: #9ab0c7;
+        --accent: #48d5b2;
+        --accent-2: #f8b85d;
+        --danger: #ff6f91;
+        --shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+        --plot-shell-bg: linear-gradient(180deg, rgba(7, 14, 24, 0.9), rgba(10, 18, 30, 0.75));
+        --control-bg: rgba(4, 10, 17, 0.6);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background:
+          radial-gradient(circle at top left, rgba(72, 213, 178, 0.12), transparent 22rem),
+          radial-gradient(circle at top right, rgba(248, 184, 93, 0.11), transparent 20rem),
+          linear-gradient(180deg, var(--bg), var(--bg-deep));
+        color: var(--text);
+        font-family: "Space Grotesk", "Segoe UI", sans-serif;
+      }
+
+      body {
+        padding: 20px;
+      }
+
+      .app {
+        display: grid;
+        grid-template-columns: minmax(240px, 360px) 14px minmax(0, 1fr);
+        gap: 18px;
+        height: calc(100vh - 40px);
+        min-height: calc(100vh - 40px);
+      }
+
+      .panel,
+      .main {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        backdrop-filter: blur(12px);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+      }
+
+      .panel {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        overflow: auto;
+        min-width: 0;
+      }
+
+      .main {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        overflow: hidden;
+        min-height: 0;
+        min-width: 0;
+      }
+
+      .side-resize-handle {
+        width: 14px;
+        cursor: ew-resize;
+        position: relative;
+        touch-action: none;
+        border-radius: 999px;
+        background: linear-gradient(180deg, rgba(72, 213, 178, 0.12), rgba(248, 184, 93, 0.12));
+      }
+
+      .side-resize-handle::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 6px;
+        height: min(120px, 36%);
+        transform: translate(-50%, -50%);
+        border-radius: 999px;
+        border: 1px solid rgba(141, 171, 206, 0.3);
+        background: linear-gradient(180deg, rgba(72, 213, 178, 0.36), rgba(248, 184, 93, 0.36));
+      }
+
+      .hero {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .eyebrow {
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        font-weight: 700;
+      }
+
+      h1 {
+        font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.3rem);
+        line-height: 1.04;
+      }
+
+      h2 {
+        font-size: 1rem;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .summary-card,
+      .info-card {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 12px;
+        background: var(--panel-strong);
+      }
+
+      .summary-card strong {
+        display: block;
+        font-size: 1.25rem;
+        margin-top: 4px;
+      }
+
+      .section {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .control-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .range-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+
+      input,
+      select,
+      button,
+      textarea {
+        border: 1px solid rgba(141, 171, 206, 0.18);
+        background: var(--control-bg);
+        color: var(--text);
+        border-radius: 12px;
+        padding: 10px 12px;
+        font: inherit;
+      }
+
+      input::placeholder {
+        color: #6e8096;
+      }
+
+      select[multiple] {
+        min-height: 170px;
+      }
+
+      button {
+        cursor: pointer;
+        transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+        border-color: rgba(72, 213, 178, 0.52);
+      }
+
+      .button-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .button-row button {
+        flex: 1 1 120px;
+      }
+
+      .primary {
+        background: linear-gradient(135deg, rgba(72, 213, 178, 0.22), rgba(72, 163, 213, 0.18));
+        border-color: rgba(72, 213, 178, 0.36);
+      }
+
+      .secondary {
+        background: linear-gradient(135deg, rgba(248, 184, 93, 0.18), rgba(248, 184, 93, 0.08));
+      }
+
+      .plot-shell {
+        position: relative;
+        min-height: 240px;
+        border-radius: 22px;
+        border: 1px solid var(--line);
+        background: var(--plot-shell-bg);
+        overflow: hidden;
+      }
+
+      .plot-resize-handle {
+        position: relative;
+        height: 14px;
+        cursor: ns-resize;
+        touch-action: none;
+        flex: 0 0 auto;
+      }
+
+      .plot-resize-handle::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: min(180px, 42%);
+        height: 6px;
+        transform: translate(-50%, -50%);
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(72, 213, 178, 0.26), rgba(248, 184, 93, 0.26));
+        border: 1px solid rgba(141, 171, 206, 0.3);
+      }
+
+      #plot {
+        width: 100%;
+        height: 100%;
+        min-height: 240px;
+      }
+
+      .status-bar {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .status-chip {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 10px 12px;
+        background: var(--panel-strong);
+      }
+
+      .status-chip strong {
+        display: block;
+        margin-top: 4px;
+      }
+
+      .status-note {
+        min-height: 18px;
+        color: var(--muted);
+        font-size: 0.84rem;
+      }
+
+      .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        align-items: stretch;
+        min-height: 0;
+        overflow: auto;
+        padding-right: 4px;
+      }
+
+      .detail-card {
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 14px;
+        background: var(--panel-strong);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-height: 0;
+        overflow: hidden;
+        height: 100%;
+      }
+
+      #detailContent,
+      #renderStatus,
+      #clusterAnalytics {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: auto;
+        padding-right: 6px;
+      }
+
+      #linked2dPlot {
+        width: 100%;
+        min-height: 220px;
+        height: 220px;
+        border: 1px solid rgba(141, 171, 206, 0.2);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      #importSessionPresetBtn {
+        border: 1px solid rgba(141, 171, 206, 0.18);
+        background: var(--control-bg);
+        color: var(--text);
+        border-radius: 12px;
+        padding: 10px 12px;
+        font: inherit;
+        cursor: pointer;
+        display: inline-flex;
+      }
+
+      .detail-card table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.82rem;
+      }
+
+      .detail-card th,
+      .detail-card td {
+        text-align: left;
+        padding: 7px 0;
+        border-bottom: 1px solid rgba(141, 171, 206, 0.08);
+        vertical-align: top;
+      }
+
+      .detail-card th {
+        width: 34%;
+        color: var(--muted);
+        font-weight: 500;
+      }
+
+      .detail-card td {
+        font-family: "IBM Plex Mono", monospace;
+        word-break: break-word;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 9px;
+        border-radius: 999px;
+        background: rgba(72, 213, 178, 0.12);
+        color: var(--accent);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .empty-state {
+        color: var(--muted);
+        border: 1px dashed rgba(141, 171, 206, 0.18);
+        border-radius: 16px;
+        padding: 14px;
+      }
+
+      .danger {
+        color: var(--danger);
+      }
+
+      @media (max-width: 1180px) {
+        .app {
+          grid-template-columns: 1fr;
+          height: auto;
+        }
+
+        .side-resize-handle {
+          display: none;
+        }
+
+        .panel {
+          max-height: none;
+        }
+
+        .main {
+          overflow: auto;
+        }
+
+        .status-bar,
+        .detail-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 720px) {
+        body {
+          padding: 12px;
+        }
+
+        .app {
+          gap: 12px;
+          min-height: calc(100vh - 24px);
+          height: auto;
+        }
+
+        .panel,
+        .main {
+          border-radius: 18px;
+          padding: 14px;
+        }
+
+        .control-grid,
+        .summary-grid,
+        .status-bar,
+        .detail-grid {
+          grid-template-columns: 1fr;
+        }
+
+      }
+    </style>
+  </head>
+  <body>
+    <div id="appShell" class="app">
+      <aside class="panel">
+        <div class="hero">
+          <div class="eyebrow">Interactive 3D Dashboard</div>
+          <h1 id="dashboardTitle"></h1>
+          <div class="muted" id="datasetMeta"></div>
+          <div class="status-note" id="samplingNote"></div>
+        </div>
+
+        <section class="summary-grid">
+          <div class="summary-card">
+            <div class="muted">Source Rows</div>
+            <strong id="totalRowsCard">0</strong>
+          </div>
+          <div class="summary-card">
+            <div class="muted">Embedded Rows</div>
+            <strong id="sampleRowsCard">0</strong>
+          </div>
+          <div class="summary-card">
+            <div class="muted">Visible Rows</div>
+            <strong id="visibleRowsCard">0</strong>
+          </div>
+          <div class="summary-card">
+            <div class="muted">Columns</div>
+            <strong id="columnCountCard">0</strong>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-header">
+            <h2>Mappings</h2>
+            <span class="pill">WebGL</span>
+          </div>
+          <div class="control-grid">
+            <label>
+              X axis
+              <select id="xSelect"></select>
+            </label>
+            <label>
+              Y axis
+              <select id="ySelect"></select>
+            </label>
+            <label>
+              Z axis
+              <select id="zSelect"></select>
+            </label>
+            <label>
+              Color
+              <select id="colorSelect"></select>
+            </label>
+            <label>
+              Size
+              <select id="sizeSelect"></select>
+            </label>
+            <label>
+              Label / Search
+              <select id="labelSelect"></select>
+            </label>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-header">
+            <h2>Axis Ranges</h2>
+            <button id="resetRangesBtn" type="button">Reset ranges</button>
+          </div>
+          <div class="control-grid">
+            <div class="info-card">
+              <div class="section-header">
+                <strong>X</strong>
+                <span class="muted" id="xRangeHint"></span>
+              </div>
+              <div class="range-grid">
+                <label>
+                  Min
+                  <input id="xMinInput" type="number" step="any" />
+                </label>
+                <label>
+                  Max
+                  <input id="xMaxInput" type="number" step="any" />
+                </label>
+              </div>
+            </div>
+            <div class="info-card">
+              <div class="section-header">
+                <strong>Y</strong>
+                <span class="muted" id="yRangeHint"></span>
+              </div>
+              <div class="range-grid">
+                <label>
+                  Min
+                  <input id="yMinInput" type="number" step="any" />
+                </label>
+                <label>
+                  Max
+                  <input id="yMaxInput" type="number" step="any" />
+                </label>
+              </div>
+            </div>
+            <div class="info-card">
+              <div class="section-header">
+                <strong>Z</strong>
+                <span class="muted" id="zRangeHint"></span>
+              </div>
+              <div class="range-grid">
+                <label>
+                  Min
+                  <input id="zMinInput" type="number" step="any" />
+                </label>
+                <label>
+                  Max
+                  <input id="zMaxInput" type="number" step="any" />
+                </label>
+              </div>
+            </div>
+            <div class="info-card">
+              <div class="section-header">
+                <strong>Rendering</strong>
+                <span class="muted">Fast path</span>
+              </div>
+              <div class="range-grid">
+                <label>
+                  Opacity
+                  <input id="opacityInput" type="range" min="0.15" max="1" step="0.05" value="0.8" />
+                </label>
+                <label>
+                  Point scale
+                  <input id="sizeScaleInput" type="range" min="0.6" max="3" step="0.1" value="1" />
+                </label>
+                <label>
+                  Theme
+                  <select id="themeSelect">
+                    <option value="nebula">Nebula</option>
+                    <option value="paper">Paper Figure</option>
+                    <option value="cartoon">Cartoon</option>
+                    <option value="molstar">Molstar-like</option>
+                  </select>
+                </label>
+                <label>
+                  Point style
+                  <select id="pointStyleSelect">
+                    <option value="sphere">Sphere</option>
+                    <option value="crisp">Crisp</option>
+                    <option value="comic">Comic Dot</option>
+                  </select>
+                </label>
+                <label>
+                  Figure preset
+                  <select id="figurePresetSelect">
+                    <option value="default">Default</option>
+                    <option value="nature">Nature-like</option>
+                    <option value="cell">Cell-like</option>
+                    <option value="neurips">NeurIPS-like</option>
+                  </select>
+                </label>
+                <button id="applyFigurePresetBtn" type="button">Apply preset</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-header">
+            <h2>Filters</h2>
+            <button id="clearFiltersBtn" type="button">Clear filters</button>
+          </div>
+          <label>
+            Category column
+            <select id="filterColumnSelect"></select>
+          </label>
+          <label>
+            Filter values
+            <input id="categorySearchInput" type="search" placeholder="Search category values" />
+          </label>
+          <select id="categoryValuesSelect" multiple></select>
+          <div class="button-row">
+            <button id="selectAllCategoriesBtn" type="button">Select all</button>
+            <button id="clearCategoriesBtn" type="button">Clear values</button>
+          </div>
+          <label>
+            Text search
+            <input id="searchInput" type="search" placeholder="Search the selected label column" />
+          </label>
+        </section>
+
+        <section class="section">
+          <div class="section-header">
+            <h2>Unsupervised Clustering</h2>
+            <span class="muted" id="clusterStatus">off</span>
+          </div>
+          <div class="control-grid">
+            <label>
+              Algorithm
+              <select id="clusterAlgoSelect">
+                <option value="kmeans">K-means</option>
+              </select>
+            </label>
+            <label>
+              Cluster K
+              <input id="clusterKInput" type="number" min="2" max="12" step="1" value="4" />
+            </label>
+          </div>
+          <div class="button-row">
+            <button class="primary" id="runClusterBtn" type="button">Run clustering</button>
+            <button id="clearClusterBtn" type="button">Clear clustering</button>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-header">
+            <h2>History & Snapshot</h2>
+            <span class="muted" id="historyStatus">0 / 0</span>
+          </div>
+          <div class="button-row">
+            <button id="undoBtn" type="button">Undo</button>
+            <button id="redoBtn" type="button">Redo</button>
+            <button id="saveSnapshotBtn" type="button">Save snapshot</button>
+          </div>
+          <label>
+            Snapshot list
+            <select id="snapshotSelect"></select>
+          </label>
+          <div class="button-row">
+            <button id="loadSnapshotBtn" type="button">Load snapshot</button>
+            <button id="deleteSnapshotBtn" type="button">Delete snapshot</button>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-header">
+            <h2>Actions</h2>
+            <span class="muted" id="cameraStatus">Camera idle</span>
+          </div>
+          <div class="button-row">
+            <button class="primary" id="saveCameraBtn" type="button">Save camera</button>
+            <button id="resetCameraBtn" type="button">Reset camera</button>
+            <button class="secondary" id="downloadCsvBtn" type="button">Export visible CSV</button>
+            <button id="download3dPngBtn" type="button">Export 3D PNG</button>
+            <button id="downloadQuadrantsBtn" type="button">Export 2D Quadrants PNG</button>
+            <button id="exportSessionPresetBtn" type="button">Export session preset</button>
+            <label style="display:inline-flex;align-items:center;justify-content:center;">
+              <input id="importSessionPresetInput" type="file" accept=".json,application/json" style="display:none;" />
+              <span id="importSessionPresetBtn">Import session preset</span>
+            </label>
+          </div>
+        </section>
+      </aside>
+      <div id="sideResizeHandle" class="side-resize-handle" title="Drag to resize left panel. Double-click to reset auto."></div>
+
+      <main class="main">
+        <section id="statusBar" class="status-bar">
+          <div class="status-chip">
+            <div class="muted">X axis</div>
+            <strong id="xStatus"></strong>
+          </div>
+          <div class="status-chip">
+            <div class="muted">Y axis</div>
+            <strong id="yStatus"></strong>
+          </div>
+          <div class="status-chip">
+            <div class="muted">Z axis</div>
+            <strong id="zStatus"></strong>
+          </div>
+          <div class="status-chip">
+            <div class="muted">Color / Size</div>
+            <strong id="styleStatus"></strong>
+          </div>
+          <div class="status-chip">
+            <div class="muted">Theme / Cluster</div>
+            <strong id="themeClusterStatus"></strong>
+          </div>
+        </section>
+
+        <section class="plot-shell">
+          <div id="plot"></div>
+        </section>
+        <div id="plotResizeHandle" class="plot-resize-handle" title="Drag to resize plot panel. Double-click to reset auto."></div>
+
+        <section id="detailGrid" class="detail-grid">
+          <div class="detail-card">
+            <div class="section-header">
+              <h3>Point Detail</h3>
+              <span class="muted">Click a point</span>
+            </div>
+            <div id="detailContent" class="empty-state">Click any point in the 3D plot to inspect its raw row values.</div>
+          </div>
+          <div class="detail-card">
+            <div class="section-header">
+              <h3>Render Status</h3>
+              <span class="muted">Live dashboard state</span>
+            </div>
+            <div id="renderStatus"></div>
+          </div>
+          <div class="detail-card">
+            <div class="section-header">
+              <h3>Linked 2D View</h3>
+              <span class="muted">Brush to filter 3D</span>
+            </div>
+            <div id="linked2dPlot"></div>
+            <div class="button-row">
+              <button id="clearBrushBtn" type="button">Clear brush</button>
+            </div>
+          </div>
+          <div class="detail-card">
+            <div class="section-header">
+              <h3>Cluster Analytics</h3>
+              <span class="muted">Quality and size</span>
+            </div>
+            <div id="clusterAnalytics"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const APP = __APP_DATA__;
+
+      const COLORS = [
+        "#48d5b2",
+        "#f8b85d",
+        "#6bc4ff",
+        "#ff7b89",
+        "#a8ff78",
+        "#ff9a57",
+        "#7c8cff",
+        "#ffc857",
+        "#4ee6ff",
+        "#ff9fda",
+        "#89f0af",
+        "#d8b4fe",
+      ];
+
+      const THEMES = {
+        nebula: {
+          accent: "#48d5b2",
+          accent2: "#f8b85d",
+          text: "#edf5ff",
+          muted: "#9ab0c7",
+          bodyBackground:
+            "radial-gradient(circle at top left, rgba(72, 213, 178, 0.12), transparent 22rem), radial-gradient(circle at top right, rgba(248, 184, 93, 0.11), transparent 20rem), linear-gradient(180deg, #09131f, #060c14)",
+          axisColor: "#cfe4ff",
+          gridColor: "rgba(146, 177, 214, 0.12)",
+          zeroColor: "rgba(146, 177, 214, 0.18)",
+          sceneBg: "rgba(11, 18, 30, 0.42)",
+          hoverBg: "#08111c",
+          panel: "rgba(13, 23, 37, 0.8)",
+          panelStrong: "rgba(16, 30, 48, 0.94)",
+          line: "rgba(117, 150, 186, 0.2)",
+          shadow: "0 24px 60px rgba(0, 0, 0, 0.28)",
+        },
+        paper: {
+          accent: "#2463eb",
+          accent2: "#e9852b",
+          text: "#122033",
+          muted: "#5f7188",
+          bodyBackground:
+            "radial-gradient(circle at top left, rgba(36, 99, 235, 0.05), transparent 26rem), radial-gradient(circle at top right, rgba(233, 133, 43, 0.08), transparent 24rem), linear-gradient(180deg, #f6f8fc, #eef2f8)",
+          axisColor: "#243246",
+          gridColor: "rgba(28, 52, 87, 0.15)",
+          zeroColor: "rgba(28, 52, 87, 0.28)",
+          sceneBg: "rgba(237, 242, 250, 0.72)",
+          hoverBg: "#ffffff",
+          panel: "rgba(255, 255, 255, 0.88)",
+          panelStrong: "rgba(247, 250, 255, 0.98)",
+          line: "rgba(102, 127, 161, 0.24)",
+          shadow: "0 18px 46px rgba(40, 59, 89, 0.16)",
+        },
+        cartoon: {
+          accent: "#ff5f5f",
+          accent2: "#ffd43b",
+          text: "#f8fbff",
+          muted: "#bed0ea",
+          bodyBackground:
+            "radial-gradient(circle at 20% 15%, rgba(255, 95, 95, 0.18), transparent 20rem), radial-gradient(circle at 80% 0%, rgba(255, 212, 59, 0.16), transparent 19rem), linear-gradient(180deg, #10233f, #0a1528)",
+          axisColor: "#f8fbff",
+          gridColor: "rgba(209, 224, 255, 0.2)",
+          zeroColor: "rgba(209, 224, 255, 0.32)",
+          sceneBg: "rgba(18, 33, 57, 0.6)",
+          hoverBg: "#132844",
+          panel: "rgba(19, 35, 61, 0.86)",
+          panelStrong: "rgba(28, 50, 82, 0.96)",
+          line: "rgba(210, 227, 255, 0.22)",
+          shadow: "0 22px 56px rgba(10, 16, 27, 0.35)",
+        },
+        molstar: {
+          accent: "#4bd4c5",
+          accent2: "#59a0ff",
+          text: "#f2fbff",
+          muted: "#95aac0",
+          bodyBackground:
+            "radial-gradient(circle at top left, rgba(75, 212, 197, 0.09), transparent 24rem), radial-gradient(circle at bottom right, rgba(89, 160, 255, 0.12), transparent 22rem), linear-gradient(180deg, #0b1018, #121a28)",
+          axisColor: "#d5e6ff",
+          gridColor: "rgba(101, 131, 171, 0.2)",
+          zeroColor: "rgba(101, 131, 171, 0.3)",
+          sceneBg: "rgba(18, 26, 40, 0.68)",
+          hoverBg: "#0f1a2d",
+          panel: "rgba(18, 26, 40, 0.82)",
+          panelStrong: "rgba(24, 35, 53, 0.95)",
+          line: "rgba(101, 131, 171, 0.2)",
+          shadow: "0 24px 60px rgba(0, 0, 0, 0.3)",
+        },
+      };
+
+      const POINT_STYLES = {
+        sphere: { symbol: "circle", lineWidth: 0, lineColor: "rgba(0,0,0,0)" },
+        crisp: { symbol: "square", lineWidth: 0.6, lineColor: "rgba(230,240,255,0.55)" },
+        comic: { symbol: "diamond", lineWidth: 1.5, lineColor: "#0b0e13" },
+      };
+
+      const DEFAULT_THEME_VARS = {
+        panel: "rgba(13, 23, 37, 0.8)",
+        panelStrong: "rgba(16, 30, 48, 0.94)",
+        line: "rgba(117, 150, 186, 0.2)",
+        shadow: "0 24px 60px rgba(0, 0, 0, 0.28)",
+      };
+
+      const elements = {
+        appShell: document.getElementById("appShell"),
+        sideResizeHandle: document.getElementById("sideResizeHandle"),
+        dashboardTitle: document.getElementById("dashboardTitle"),
+        datasetMeta: document.getElementById("datasetMeta"),
+        samplingNote: document.getElementById("samplingNote"),
+        totalRowsCard: document.getElementById("totalRowsCard"),
+        sampleRowsCard: document.getElementById("sampleRowsCard"),
+        visibleRowsCard: document.getElementById("visibleRowsCard"),
+        columnCountCard: document.getElementById("columnCountCard"),
+        xSelect: document.getElementById("xSelect"),
+        ySelect: document.getElementById("ySelect"),
+        zSelect: document.getElementById("zSelect"),
+        colorSelect: document.getElementById("colorSelect"),
+        sizeSelect: document.getElementById("sizeSelect"),
+        labelSelect: document.getElementById("labelSelect"),
+        filterColumnSelect: document.getElementById("filterColumnSelect"),
+        categoryValuesSelect: document.getElementById("categoryValuesSelect"),
+        categorySearchInput: document.getElementById("categorySearchInput"),
+        searchInput: document.getElementById("searchInput"),
+        opacityInput: document.getElementById("opacityInput"),
+        sizeScaleInput: document.getElementById("sizeScaleInput"),
+        themeSelect: document.getElementById("themeSelect"),
+        pointStyleSelect: document.getElementById("pointStyleSelect"),
+        figurePresetSelect: document.getElementById("figurePresetSelect"),
+        applyFigurePresetBtn: document.getElementById("applyFigurePresetBtn"),
+        xMinInput: document.getElementById("xMinInput"),
+        xMaxInput: document.getElementById("xMaxInput"),
+        yMinInput: document.getElementById("yMinInput"),
+        yMaxInput: document.getElementById("yMaxInput"),
+        zMinInput: document.getElementById("zMinInput"),
+        zMaxInput: document.getElementById("zMaxInput"),
+        xRangeHint: document.getElementById("xRangeHint"),
+        yRangeHint: document.getElementById("yRangeHint"),
+        zRangeHint: document.getElementById("zRangeHint"),
+        resetRangesBtn: document.getElementById("resetRangesBtn"),
+        clearFiltersBtn: document.getElementById("clearFiltersBtn"),
+        selectAllCategoriesBtn: document.getElementById("selectAllCategoriesBtn"),
+        clearCategoriesBtn: document.getElementById("clearCategoriesBtn"),
+        saveCameraBtn: document.getElementById("saveCameraBtn"),
+        resetCameraBtn: document.getElementById("resetCameraBtn"),
+        downloadCsvBtn: document.getElementById("downloadCsvBtn"),
+        download3dPngBtn: document.getElementById("download3dPngBtn"),
+        downloadQuadrantsBtn: document.getElementById("downloadQuadrantsBtn"),
+        clusterAlgoSelect: document.getElementById("clusterAlgoSelect"),
+        clusterKInput: document.getElementById("clusterKInput"),
+        runClusterBtn: document.getElementById("runClusterBtn"),
+        clearClusterBtn: document.getElementById("clearClusterBtn"),
+        undoBtn: document.getElementById("undoBtn"),
+        redoBtn: document.getElementById("redoBtn"),
+        saveSnapshotBtn: document.getElementById("saveSnapshotBtn"),
+        snapshotSelect: document.getElementById("snapshotSelect"),
+        loadSnapshotBtn: document.getElementById("loadSnapshotBtn"),
+        deleteSnapshotBtn: document.getElementById("deleteSnapshotBtn"),
+        historyStatus: document.getElementById("historyStatus"),
+        clusterStatus: document.getElementById("clusterStatus"),
+        cameraStatus: document.getElementById("cameraStatus"),
+        exportSessionPresetBtn: document.getElementById("exportSessionPresetBtn"),
+        importSessionPresetInput: document.getElementById("importSessionPresetInput"),
+        importSessionPresetBtn: document.getElementById("importSessionPresetBtn"),
+        plot: document.getElementById("plot"),
+        plotResizeHandle: document.getElementById("plotResizeHandle"),
+        statusBar: document.getElementById("statusBar"),
+        detailGrid: document.getElementById("detailGrid"),
+        detailContent: document.getElementById("detailContent"),
+        renderStatus: document.getElementById("renderStatus"),
+        linked2dPlot: document.getElementById("linked2dPlot"),
+        clearBrushBtn: document.getElementById("clearBrushBtn"),
+        clusterAnalytics: document.getElementById("clusterAnalytics"),
+        xStatus: document.getElementById("xStatus"),
+        yStatus: document.getElementById("yStatus"),
+        zStatus: document.getElementById("zStatus"),
+        styleStatus: document.getElementById("styleStatus"),
+        themeClusterStatus: document.getElementById("themeClusterStatus"),
+      };
+
+      const columnMeta = APP.columnMeta;
+      const metaByName = Object.fromEntries(columnMeta.map((item) => [item.name, item]));
+      const numericColumns = columnMeta.filter((item) => item.kind === "numeric").map((item) => item.name);
+      const categoricalColumns = columnMeta
+        .filter((item) => item.kind === "categorical" || item.kind === "boolean")
+        .map((item) => item.name);
+      const labelColumns = columnMeta.filter((item) => item.kind !== "numeric").map((item) => item.name);
+      const storageKey = `3dplot-dashboard::camera::${APP.sourceName}::${APP.sheetName || "default"}`;
+      const plotHeightStorageKey = `3dplot-dashboard::plot-height::${APP.sourceName}::${APP.sheetName || "default"}`;
+      const sideWidthStorageKey = `3dplot-dashboard::side-width::${APP.sourceName}::${APP.sheetName || "default"}`;
+      const snapshotStorageKey = `3dplot-dashboard::snapshots::${APP.sourceName}::${APP.sheetName || "default"}`;
+      const uniqueValueCache = new Map();
+      let plotEventsBound = false;
+      let linked2dEventsBound = false;
+      const CLUSTER_MAX_TRAIN_POINTS = 12000;
+      const HISTORY_LIMIT = 60;
+      let visibleCacheKey = "";
+      let visibleCacheIndex = [];
+      let clusterCacheKey = "";
+      let clusterCachePayload = null;
+      let suppressHistory = false;
+
+      const FIGURE_PRESETS = {
+        default: { theme: null, opacity: null, sizeScale: null, export3d: { width: 3200, height: 2200, scale: 2 } },
+        nature: { theme: "paper", opacity: 0.86, sizeScale: 1.12, export3d: { width: 3600, height: 2600, scale: 2 } },
+        cell: { theme: "molstar", opacity: 0.8, sizeScale: 1.2, export3d: { width: 3400, height: 2400, scale: 2 } },
+        neurips: { theme: "nebula", opacity: 0.78, sizeScale: 1.0, export3d: { width: 3200, height: 2000, scale: 2 } },
+      };
+
+      const state = {
+        x: APP.defaults.x,
+        y: APP.defaults.y,
+        z: APP.defaults.z,
+        color: APP.defaults.color || "",
+        size: APP.defaults.size || "",
+        label: APP.defaults.label || "",
+        filterColumn: APP.defaults.filterColumn || "",
+        selectedCategories: new Set(),
+        searchText: "",
+        opacity: Number(elements.opacityInput.value),
+        sizeScale: Number(elements.sizeScaleInput.value),
+        figurePreset: "default",
+        theme: "nebula",
+        pointStyle: "sphere",
+        clusterEnabled: false,
+        clusterAlgo: "kmeans",
+        clusterK: Number(elements.clusterKInput.value) || 4,
+        clusterRowIds: [],
+        clusterAssignments: new Map(),
+        clusterCentroids: [],
+        clusterTrainCount: 0,
+        clusterInertia: null,
+        clusterSilhouette: null,
+        clusterCounts: [],
+        visibleIndex: [],
+        brushedRows: new Set(),
+        historyStack: [],
+        historyIndex: -1,
+        snapshots: loadSnapshots(),
+        camera: loadSavedCamera(),
+        manualPlotHeight: loadSavedPlotHeight(),
+        manualSideWidth: loadSavedSideWidth(),
+        lastClickedRow: null,
+      };
+
+      init();
+
+      function init() {
+        if (!window.Plotly) {
+          elements.renderStatus.innerHTML = `<div class="empty-state danger">Plotly.js could not be loaded. If you are offline, regenerate the dashboard with a local Plotly bundle URL.</div>`;
+          return;
+        }
+
+        elements.dashboardTitle.textContent = APP.title;
+        elements.datasetMeta.textContent = `${APP.sourceName}${APP.sheetName ? ` • ${APP.sheetName}` : ""} • generated ${new Date(APP.generatedAt).toLocaleString()}`;
+        elements.samplingNote.textContent = APP.samplingNote || "All source rows were embedded into this dashboard.";
+        elements.totalRowsCard.textContent = formatCount(APP.rowCount);
+        elements.sampleRowsCard.textContent = formatCount(APP.sampledRowCount);
+        elements.columnCountCard.textContent = formatCount(APP.columnOrder.length);
+        elements.cameraStatus.textContent = state.camera ? "Saved camera loaded" : "Camera idle";
+        elements.themeSelect.value = state.theme;
+        elements.pointStyleSelect.value = state.pointStyle;
+        elements.figurePresetSelect.value = state.figurePreset;
+        elements.clusterAlgoSelect.value = state.clusterAlgo;
+        elements.clusterStatus.textContent = "off";
+        applyTheme(state.theme);
+
+        populateSelect(elements.xSelect, numericColumns, state.x);
+        populateSelect(elements.ySelect, numericColumns, state.y);
+        populateSelect(elements.zSelect, numericColumns, state.z);
+        populateSelect(elements.colorSelect, ["", ...APP.columnOrder], state.color, "None");
+        populateSelect(elements.sizeSelect, ["", ...numericColumns], state.size, "Constant");
+        populateSelect(elements.labelSelect, ["", ...labelColumns], state.label, "None");
+        populateSelect(elements.filterColumnSelect, ["", ...categoricalColumns], state.filterColumn, "None");
+
+        syncAxisRangeInputs("x");
+        syncAxisRangeInputs("y");
+        syncAxisRangeInputs("z");
+        refreshCategoryOptions(true);
+        refreshSnapshotSelect();
+        pushHistorySnapshot("init");
+        applySidebarWidth();
+        attachEvents();
+        fitPlotToViewport();
+        fitDetailPanelsToViewport();
+        render();
+      }
+
+      function attachEvents() {
+        elements.xSelect.addEventListener("change", () => {
+          state.x = elements.xSelect.value;
+          syncAxisRangeInputs("x");
+          render();
+        });
+        elements.ySelect.addEventListener("change", () => {
+          state.y = elements.ySelect.value;
+          syncAxisRangeInputs("y");
+          render();
+        });
+        elements.zSelect.addEventListener("change", () => {
+          state.z = elements.zSelect.value;
+          syncAxisRangeInputs("z");
+          render();
+        });
+        elements.colorSelect.addEventListener("change", () => {
+          state.color = elements.colorSelect.value;
+          render();
+        });
+        elements.sizeSelect.addEventListener("change", () => {
+          state.size = elements.sizeSelect.value;
+          render();
+        });
+        elements.labelSelect.addEventListener("change", () => {
+          state.label = elements.labelSelect.value;
+          render();
+        });
+        elements.filterColumnSelect.addEventListener("change", () => {
+          state.filterColumn = elements.filterColumnSelect.value;
+          state.selectedCategories = new Set();
+          refreshCategoryOptions(true);
+          render();
+        });
+        elements.categoryValuesSelect.addEventListener("change", () => {
+          state.selectedCategories = new Set(Array.from(elements.categoryValuesSelect.selectedOptions).map((option) => option.value));
+          render();
+        });
+        elements.categorySearchInput.addEventListener("input", debounce(() => {
+          refreshCategoryOptions(false);
+        }, 80));
+        elements.searchInput.addEventListener("input", debounce(() => {
+          state.searchText = elements.searchInput.value.trim().toLowerCase();
+          render();
+        }, 120));
+        elements.opacityInput.addEventListener("input", () => {
+          state.opacity = Number(elements.opacityInput.value);
+          render();
+        });
+        elements.sizeScaleInput.addEventListener("input", () => {
+          state.sizeScale = Number(elements.sizeScaleInput.value);
+          render();
+        });
+        elements.themeSelect.addEventListener("change", () => {
+          pushHistorySnapshot("theme");
+          state.theme = elements.themeSelect.value;
+          applyTheme(state.theme);
+          render();
+        });
+        elements.pointStyleSelect.addEventListener("change", () => {
+          pushHistorySnapshot("point-style");
+          state.pointStyle = elements.pointStyleSelect.value;
+          render();
+        });
+        elements.applyFigurePresetBtn.addEventListener("click", () => {
+          applyFigurePreset();
+        });
+        elements.clusterAlgoSelect.addEventListener("change", () => {
+          state.clusterAlgo = elements.clusterAlgoSelect.value;
+        });
+        elements.clusterKInput.addEventListener("change", () => {
+          state.clusterK = normalizeClusterK(elements.clusterKInput.value);
+          elements.clusterKInput.value = String(state.clusterK);
+        });
+        [elements.xMinInput, elements.xMaxInput, elements.yMinInput, elements.yMaxInput, elements.zMinInput, elements.zMaxInput].forEach((input) => {
+          input.addEventListener("input", debounce(render, 80));
+        });
+        elements.resetRangesBtn.addEventListener("click", () => {
+          syncAxisRangeInputs("x");
+          syncAxisRangeInputs("y");
+          syncAxisRangeInputs("z");
+          render();
+        });
+        elements.clearFiltersBtn.addEventListener("click", () => {
+          state.filterColumn = APP.defaults.filterColumn || "";
+          elements.filterColumnSelect.value = state.filterColumn;
+          state.selectedCategories = new Set();
+          state.searchText = "";
+          elements.searchInput.value = "";
+          elements.categorySearchInput.value = "";
+          refreshCategoryOptions(true);
+          render();
+        });
+        elements.selectAllCategoriesBtn.addEventListener("click", () => {
+          const options = Array.from(elements.categoryValuesSelect.options);
+          options.forEach((option) => {
+            option.selected = true;
+          });
+          state.selectedCategories = new Set(options.map((option) => option.value));
+          render();
+        });
+        elements.clearCategoriesBtn.addEventListener("click", () => {
+          const options = Array.from(elements.categoryValuesSelect.options);
+          options.forEach((option) => {
+            option.selected = false;
+          });
+          state.selectedCategories = new Set();
+          render();
+        });
+        elements.saveCameraBtn.addEventListener("click", saveCurrentCamera);
+        elements.resetCameraBtn.addEventListener("click", resetCamera);
+        elements.downloadCsvBtn.addEventListener("click", exportVisibleCsv);
+        elements.download3dPngBtn.addEventListener("click", export3dPng);
+        elements.downloadQuadrantsBtn.addEventListener("click", exportQuadrantsPng);
+        elements.runClusterBtn.addEventListener("click", runClustering);
+        elements.clearClusterBtn.addEventListener("click", clearClustering);
+        elements.undoBtn.addEventListener("click", undoHistory);
+        elements.redoBtn.addEventListener("click", redoHistory);
+        elements.saveSnapshotBtn.addEventListener("click", saveCurrentSnapshot);
+        elements.loadSnapshotBtn.addEventListener("click", loadSelectedSnapshot);
+        elements.deleteSnapshotBtn.addEventListener("click", deleteSelectedSnapshot);
+        elements.clearBrushBtn.addEventListener("click", clearBrushSelection);
+        elements.exportSessionPresetBtn.addEventListener("click", exportSessionPreset);
+        elements.importSessionPresetBtn.addEventListener("click", () => elements.importSessionPresetInput.click());
+        elements.importSessionPresetInput.addEventListener("change", importSessionPreset);
+        attachSidebarResizeEvents();
+        attachPlotResizeEvents();
+        window.addEventListener(
+          "resize",
+          debounce(() => {
+            applySidebarWidth();
+            fitPlotToViewport();
+            fitDetailPanelsToViewport();
+            render();
+          }, 120)
+        );
+      }
+
+      function applySidebarWidth() {
+        if (!elements.appShell) {
+          return;
+        }
+        const wideLayout = window.matchMedia("(min-width: 1181px)").matches;
+        if (!wideLayout) {
+          elements.appShell.style.gridTemplateColumns = "1fr";
+          return;
+        }
+
+        const totalWidth = Math.floor(elements.appShell.getBoundingClientRect().width || window.innerWidth);
+        const hardMin = 240;
+        const hardMax = Math.max(hardMin, totalWidth - 14 - 380);
+        const autoWidth = Math.min(360, hardMax);
+        const target = state.manualSideWidth == null
+          ? autoWidth
+          : Math.max(hardMin, Math.min(hardMax, Number(state.manualSideWidth) || autoWidth));
+        if (state.manualSideWidth != null) {
+          state.manualSideWidth = target;
+        }
+        elements.appShell.style.gridTemplateColumns = `${Math.round(target)}px 14px minmax(0, 1fr)`;
+      }
+
+      function attachSidebarResizeEvents() {
+        if (!elements.sideResizeHandle || !elements.appShell) {
+          return;
+        }
+
+        const handle = elements.sideResizeHandle;
+        handle.addEventListener("dblclick", () => {
+          state.manualSideWidth = null;
+          clearSavedSideWidth();
+          applySidebarWidth();
+          fitPlotToViewport();
+          fitDetailPanelsToViewport();
+          render();
+        });
+
+        handle.addEventListener("pointerdown", (event) => {
+          if (event.button !== 0) {
+            return;
+          }
+          const wideLayout = window.matchMedia("(min-width: 1181px)").matches;
+          if (!wideLayout) {
+            return;
+          }
+          event.preventDefault();
+
+          const startX = event.clientX;
+          const currentColumns = elements.appShell.style.gridTemplateColumns;
+          const startWidth = currentColumns
+            ? Number(currentColumns.split("px")[0]) || 360
+            : Math.max(240, Math.min(360, Math.floor(elements.appShell.getBoundingClientRect().width * 0.3)));
+          const pointerId = event.pointerId;
+          if (typeof handle.setPointerCapture === "function") {
+            handle.setPointerCapture(pointerId);
+          }
+
+          const previousUserSelect = document.body.style.userSelect;
+          const previousCursor = document.body.style.cursor;
+          document.body.style.userSelect = "none";
+          document.body.style.cursor = "ew-resize";
+
+          const onMove = (moveEvent) => {
+            const totalWidth = Math.floor(elements.appShell.getBoundingClientRect().width || window.innerWidth);
+            const hardMin = 240;
+            const hardMax = Math.max(hardMin, totalWidth - 14 - 380);
+            const delta = moveEvent.clientX - startX;
+            state.manualSideWidth = Math.max(hardMin, Math.min(hardMax, startWidth + delta));
+            applySidebarWidth();
+            fitPlotToViewport();
+            fitDetailPanelsToViewport();
+          };
+
+          const cleanup = () => {
+            window.removeEventListener("pointermove", onMove);
+            window.removeEventListener("pointerup", onUp);
+            window.removeEventListener("pointercancel", onUp);
+            if (typeof handle.releasePointerCapture === "function" && handle.hasPointerCapture(pointerId)) {
+              handle.releasePointerCapture(pointerId);
+            }
+            document.body.style.userSelect = previousUserSelect;
+            document.body.style.cursor = previousCursor;
+            saveSideWidth(state.manualSideWidth);
+            render();
+          };
+
+          const onUp = () => {
+            cleanup();
+          };
+
+          window.addEventListener("pointermove", onMove);
+          window.addEventListener("pointerup", onUp);
+          window.addEventListener("pointercancel", onUp);
+        });
+      }
+
+      function attachPlotResizeEvents() {
+        if (!elements.plotResizeHandle) {
+          return;
+        }
+
+        const handle = elements.plotResizeHandle;
+        handle.addEventListener("dblclick", () => {
+          state.manualPlotHeight = null;
+          clearSavedPlotHeight();
+          fitPlotToViewport();
+          fitDetailPanelsToViewport();
+          render();
+        });
+
+        handle.addEventListener("pointerdown", (event) => {
+          if (event.button !== 0) {
+            return;
+          }
+          event.preventDefault();
+          const shell = elements.plot && elements.plot.parentElement;
+          if (!shell) {
+            return;
+          }
+
+          const startY = event.clientY;
+          const startHeight = shell.getBoundingClientRect().height;
+          const pointerId = event.pointerId;
+          if (typeof handle.setPointerCapture === "function") {
+            handle.setPointerCapture(pointerId);
+          }
+
+          const previousUserSelect = document.body.style.userSelect;
+          const previousCursor = document.body.style.cursor;
+          document.body.style.userSelect = "none";
+          document.body.style.cursor = "ns-resize";
+
+          const onMove = (moveEvent) => {
+            const delta = moveEvent.clientY - startY;
+            state.manualPlotHeight = startHeight + delta;
+            fitPlotToViewport();
+            fitDetailPanelsToViewport();
+          };
+
+          const cleanup = () => {
+            window.removeEventListener("pointermove", onMove);
+            window.removeEventListener("pointerup", onUp);
+            window.removeEventListener("pointercancel", onUp);
+            if (typeof handle.releasePointerCapture === "function" && handle.hasPointerCapture(pointerId)) {
+              handle.releasePointerCapture(pointerId);
+            }
+            document.body.style.userSelect = previousUserSelect;
+            document.body.style.cursor = previousCursor;
+            savePlotHeight(state.manualPlotHeight);
+            render();
+          };
+
+          const onUp = () => {
+            cleanup();
+          };
+
+          window.addEventListener("pointermove", onMove);
+          window.addEventListener("pointerup", onUp);
+          window.addEventListener("pointercancel", onUp);
+        });
+      }
+
+      function serializeViewState() {
+        return {
+          x: state.x,
+          y: state.y,
+          z: state.z,
+          color: state.color,
+          size: state.size,
+          label: state.label,
+          filterColumn: state.filterColumn,
+          selectedCategories: Array.from(state.selectedCategories),
+          searchText: state.searchText,
+          opacity: state.opacity,
+          sizeScale: state.sizeScale,
+          theme: state.theme,
+          pointStyle: state.pointStyle,
+          figurePreset: state.figurePreset,
+          clusterAlgo: state.clusterAlgo,
+          clusterK: state.clusterK,
+          manualPlotHeight: state.manualPlotHeight,
+          manualSideWidth: state.manualSideWidth,
+          axisInputs: {
+            xMin: elements.xMinInput.value,
+            xMax: elements.xMaxInput.value,
+            yMin: elements.yMinInput.value,
+            yMax: elements.yMaxInput.value,
+            zMin: elements.zMinInput.value,
+            zMax: elements.zMaxInput.value,
+          },
+        };
+      }
+
+      function applyViewState(snapshot, rerender = true) {
+        if (!snapshot) {
+          return;
+        }
+        suppressHistory = true;
+        state.x = snapshot.x ?? state.x;
+        state.y = snapshot.y ?? state.y;
+        state.z = snapshot.z ?? state.z;
+        state.color = snapshot.color ?? "";
+        state.size = snapshot.size ?? "";
+        state.label = snapshot.label ?? "";
+        state.filterColumn = snapshot.filterColumn ?? "";
+        state.selectedCategories = new Set(snapshot.selectedCategories || []);
+        state.searchText = snapshot.searchText ?? "";
+        state.opacity = Number(snapshot.opacity ?? state.opacity);
+        state.sizeScale = Number(snapshot.sizeScale ?? state.sizeScale);
+        state.theme = snapshot.theme ?? state.theme;
+        state.pointStyle = snapshot.pointStyle ?? state.pointStyle;
+        state.figurePreset = snapshot.figurePreset || "default";
+        state.clusterAlgo = snapshot.clusterAlgo || "kmeans";
+        state.clusterK = normalizeClusterK(snapshot.clusterK ?? state.clusterK);
+        state.manualPlotHeight = snapshot.manualPlotHeight ?? null;
+        state.manualSideWidth = snapshot.manualSideWidth ?? null;
+
+        elements.xSelect.value = state.x;
+        elements.ySelect.value = state.y;
+        elements.zSelect.value = state.z;
+        elements.colorSelect.value = state.color;
+        elements.sizeSelect.value = state.size;
+        elements.labelSelect.value = state.label;
+        elements.filterColumnSelect.value = state.filterColumn;
+        elements.searchInput.value = state.searchText;
+        elements.opacityInput.value = String(state.opacity);
+        elements.sizeScaleInput.value = String(state.sizeScale);
+        elements.themeSelect.value = state.theme;
+        elements.pointStyleSelect.value = state.pointStyle;
+        elements.figurePresetSelect.value = state.figurePreset;
+        elements.clusterAlgoSelect.value = state.clusterAlgo;
+        elements.clusterKInput.value = String(state.clusterK);
+        elements.xMinInput.value = snapshot.axisInputs?.xMin ?? "";
+        elements.xMaxInput.value = snapshot.axisInputs?.xMax ?? "";
+        elements.yMinInput.value = snapshot.axisInputs?.yMin ?? "";
+        elements.yMaxInput.value = snapshot.axisInputs?.yMax ?? "";
+        elements.zMinInput.value = snapshot.axisInputs?.zMin ?? "";
+        elements.zMaxInput.value = snapshot.axisInputs?.zMax ?? "";
+        applyTheme(state.theme);
+        applySidebarWidth();
+        refreshCategoryOptions(false);
+        clearClustering(false);
+        suppressHistory = false;
+        if (rerender) {
+          render();
+        }
+      }
+
+      function pushHistorySnapshot(reason) {
+        if (suppressHistory) {
+          return;
+        }
+        const snapshot = serializeViewState();
+        const current = state.historyIndex >= 0 ? state.historyStack[state.historyIndex] : null;
+        if (current && JSON.stringify(current) === JSON.stringify(snapshot)) {
+          refreshHistoryStatus();
+          return;
+        }
+        if (state.historyIndex < state.historyStack.length - 1) {
+          state.historyStack = state.historyStack.slice(0, state.historyIndex + 1);
+        }
+        state.historyStack.push(snapshot);
+        if (state.historyStack.length > HISTORY_LIMIT) {
+          state.historyStack = state.historyStack.slice(state.historyStack.length - HISTORY_LIMIT);
+        }
+        state.historyIndex = state.historyStack.length - 1;
+        refreshHistoryStatus(reason);
+      }
+
+      function undoHistory() {
+        if (state.historyIndex <= 0) {
+          return;
+        }
+        state.historyIndex -= 1;
+        applyViewState(state.historyStack[state.historyIndex], true);
+        refreshHistoryStatus("undo");
+      }
+
+      function redoHistory() {
+        if (state.historyIndex >= state.historyStack.length - 1) {
+          return;
+        }
+        state.historyIndex += 1;
+        applyViewState(state.historyStack[state.historyIndex], true);
+        refreshHistoryStatus("redo");
+      }
+
+      function refreshHistoryStatus() {
+        elements.historyStatus.textContent = `${state.historyIndex + 1} / ${state.historyStack.length}`;
+        elements.undoBtn.disabled = state.historyIndex <= 0;
+        elements.redoBtn.disabled = state.historyIndex >= state.historyStack.length - 1;
+      }
+
+      function saveCurrentSnapshot() {
+        const name = window.prompt("Snapshot name", `view-${new Date().toISOString().slice(11, 19).replace(/:/g, "")}`);
+        if (!name) {
+          return;
+        }
+        const item = { id: `${Date.now()}-${Math.random().toString(16).slice(2, 8)}`, name: name.trim(), state: serializeViewState() };
+        state.snapshots.push(item);
+        saveSnapshots(state.snapshots);
+        refreshSnapshotSelect(item.id);
+      }
+
+      function loadSelectedSnapshot() {
+        const id = elements.snapshotSelect.value;
+        if (!id) {
+          return;
+        }
+        const item = state.snapshots.find((entry) => entry.id === id);
+        if (!item) {
+          return;
+        }
+        applyViewState(item.state, true);
+        pushHistorySnapshot("load-snapshot");
+      }
+
+      function deleteSelectedSnapshot() {
+        const id = elements.snapshotSelect.value;
+        if (!id) {
+          return;
+        }
+        state.snapshots = state.snapshots.filter((entry) => entry.id !== id);
+        saveSnapshots(state.snapshots);
+        refreshSnapshotSelect();
+      }
+
+      function refreshSnapshotSelect(selectedId) {
+        elements.snapshotSelect.innerHTML = "";
+        const empty = document.createElement("option");
+        empty.value = "";
+        empty.textContent = state.snapshots.length ? "Select snapshot" : "No snapshots";
+        elements.snapshotSelect.appendChild(empty);
+        for (const item of state.snapshots) {
+          const option = document.createElement("option");
+          option.value = item.id;
+          option.textContent = item.name;
+          option.selected = selectedId ? item.id === selectedId : false;
+          elements.snapshotSelect.appendChild(option);
+        }
+      }
+
+      function saveSnapshots(items) {
+        localStorage.setItem(snapshotStorageKey, JSON.stringify(items || []));
+      }
+
+      function loadSnapshots() {
+        try {
+          const raw = localStorage.getItem(snapshotStorageKey);
+          if (!raw) {
+            return [];
+          }
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (error) {
+          return [];
+        }
+      }
+
+      function applyFigurePreset() {
+        const presetName = elements.figurePresetSelect.value || "default";
+        const preset = FIGURE_PRESETS[presetName] || FIGURE_PRESETS.default;
+        pushHistorySnapshot("figure-preset");
+        state.figurePreset = presetName;
+        if (preset.theme) {
+          state.theme = preset.theme;
+          elements.themeSelect.value = state.theme;
+          applyTheme(state.theme);
+        }
+        if (preset.opacity != null) {
+          state.opacity = Number(preset.opacity);
+          elements.opacityInput.value = String(state.opacity);
+        }
+        if (preset.sizeScale != null) {
+          state.sizeScale = Number(preset.sizeScale);
+          elements.sizeScaleInput.value = String(state.sizeScale);
+        }
+        render();
+      }
+
+      function clearBrushSelection() {
+        state.brushedRows = new Set();
+        render();
+      }
+
+      function exportSessionPreset() {
+        const payload = {
+          version: 1,
+          sourceName: APP.sourceName,
+          sheetName: APP.sheetName,
+          exportedAt: new Date().toISOString(),
+          viewState: serializeViewState(),
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${sanitizeFileStem(APP.sourceName)}.session-preset.json`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      function importSessionPreset(event) {
+        const file = event.target.files && event.target.files[0];
+        event.target.value = "";
+        if (!file) {
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const parsed = JSON.parse(String(reader.result || "{}"));
+            const incoming = parsed.viewState || parsed.state || parsed;
+            if (!incoming || typeof incoming !== "object") {
+              throw new Error("Invalid preset");
+            }
+            applyViewState(incoming, true);
+            pushHistorySnapshot("import-preset");
+          } catch (error) {
+            elements.cameraStatus.textContent = "Preset import failed";
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      function render() {
+        fitPlotToViewport();
+        fitDetailPanelsToViewport();
+        const visibleIndex = getVisibleIndexCached();
+        state.visibleIndex = visibleIndex;
+        if (state.clusterEnabled) {
+          const visibleSet = new Set(visibleIndex);
+          const clusterVisible = state.clusterRowIds.filter((rowId) => visibleSet.has(rowId));
+          if (clusterVisible.length < 2) {
+            clearClustering(false);
+          }
+        }
+        elements.visibleRowsCard.textContent = formatCount(visibleIndex.length);
+        elements.xStatus.textContent = state.x;
+        elements.yStatus.textContent = state.y;
+        elements.zStatus.textContent = state.z;
+        elements.styleStatus.textContent = `${state.clusterEnabled ? "cluster color" : state.color || "solid color"} / ${state.size || "constant size"}`;
+        elements.themeClusterStatus.textContent = `${state.theme} / ${state.clusterEnabled ? `k=${state.clusterK}` : "off"}`;
+        updateRenderStatus();
+        renderClusterAnalytics();
+        renderLinked2dPlot();
+        refreshHistoryStatus();
+        fitDetailPanelsToViewport();
+        pushHistorySnapshot("render");
+
+        if (visibleIndex.length === 0) {
+          Plotly.react(elements.plot, [], buildLayout(), buildConfig()).then(bindPlotEvents);
+          elements.renderStatus.innerHTML = `<div class="empty-state">No points match the current filters or axis ranges.</div>`;
+          return;
+        }
+
+        const traces = buildTraces(visibleIndex);
+        Plotly.react(elements.plot, traces, buildLayout(), buildConfig()).then(() => {
+          bindPlotEvents();
+          if (state.lastClickedRow != null) {
+            renderDetail(state.lastClickedRow);
+          }
+        });
+      }
+
+      function fitPlotToViewport() {
+        if (!elements.plot || !elements.plot.parentElement) {
+          return;
+        }
+        const shell = elements.plot.parentElement;
+        const main = shell.closest(".main");
+        if (!main) {
+          return;
+        }
+        const wideLayout = window.matchMedia("(min-width: 1181px)").matches;
+        const baseMin = wideLayout ? 240 : 264;
+        const viewportCap = Math.floor(window.innerHeight * (wideLayout ? 0.68 : 0.6));
+        const maxAllowed = Math.max(baseMin, viewportCap);
+        const detailReservedMin = wideLayout ? 190 : 168;
+
+        const mainRect = main.getBoundingClientRect();
+        const shellRect = shell.getBoundingClientRect();
+        const mainStyles = window.getComputedStyle(main);
+        const rowGap = parseFloat(mainStyles.gap || "0") || 0;
+
+        const mainTopPadding = parseFloat(mainStyles.paddingTop || "0") || 0;
+        const mainBottomPadding = parseFloat(mainStyles.paddingBottom || "0") || 0;
+        const statusHeight = elements.statusBar ? Math.ceil(elements.statusBar.getBoundingClientRect().height) : 0;
+
+        const consumed = mainTopPadding + mainBottomPadding + statusHeight + detailReservedMin + rowGap * 2;
+        const available = Math.floor(mainRect.height - consumed);
+        const autoHeight = Math.max(baseMin, Math.min(maxAllowed, Number.isFinite(available) ? available : baseMin));
+        const fitted = state.manualPlotHeight == null
+          ? autoHeight
+          : Math.max(baseMin, Math.min(autoHeight, Number(state.manualPlotHeight) || autoHeight));
+        if (state.manualPlotHeight != null) {
+          state.manualPlotHeight = fitted;
+        }
+
+        if (elements.detailGrid) {
+          elements.detailGrid.style.minHeight = `${detailReservedMin}px`;
+          elements.detailGrid.style.flex = "1 1 auto";
+        }
+        shell.style.height = `${fitted}px`;
+        elements.plot.style.minHeight = `${fitted}px`;
+        shell.style.minHeight = `${fitted}px`;
+        shell.style.flex = "0 0 auto";
+
+        const delta = Math.abs(shellRect.height - fitted);
+        if (delta > 2 && window.Plotly && typeof window.Plotly.Plots?.resize === "function") {
+          window.Plotly.Plots.resize(elements.plot);
+        }
+      }
+
+      function fitDetailPanelsToViewport() {
+        if (!elements.detailGrid) {
+          return;
+        }
+        const wideLayout = window.matchMedia("(min-width: 1181px)").matches;
+        const gridTop = elements.detailGrid.getBoundingClientRect().top;
+        const viewportBottomPadding = wideLayout ? 18 : 12;
+        const availableHeight = Math.floor(window.innerHeight - gridTop - viewportBottomPadding);
+        const gridTargetHeight = Math.max(wideLayout ? 160 : 136, availableHeight);
+        elements.detailGrid.style.height = `${gridTargetHeight}px`;
+        elements.detailGrid.style.maxHeight = `${gridTargetHeight}px`;
+        elements.detailGrid.style.minHeight = `${Math.max(110, Math.floor(gridTargetHeight * 0.6))}px`;
+      }
+
+      function bindPlotEvents() {
+        if (plotEventsBound || typeof elements.plot.on !== "function") {
+          return;
+        }
+        plotEventsBound = true;
+        elements.plot.on("plotly_click", (event) => {
+          const point = event.points && event.points[0];
+          if (!point || point.customdata == null) {
+            return;
+          }
+          state.lastClickedRow = point.customdata;
+          state.brushedRows = new Set([point.customdata]);
+          renderDetail(point.customdata);
+          render();
+        });
+        elements.plot.on("plotly_relayout", (event) => {
+          if (event["scene.camera"]) {
+            state.camera = event["scene.camera"];
+          }
+        });
+      }
+
+      function buildTraces(visibleIndex) {
+        if (state.clusterEnabled) {
+          return buildClusterTraces(visibleIndex);
+        }
+        return [buildSingleTrace(visibleIndex, null)];
+      }
+
+      function buildClusterTraces(visibleIndex) {
+        const grouped = new Map();
+        for (const rowIndex of visibleIndex) {
+          const clusterId = state.clusterAssignments.get(rowIndex);
+          if (clusterId == null) {
+            continue;
+          }
+          if (!grouped.has(clusterId)) {
+            grouped.set(clusterId, []);
+          }
+          grouped.get(clusterId).push(rowIndex);
+        }
+
+        const traces = [];
+        const sortedClusters = Array.from(grouped.keys()).sort((left, right) => left - right);
+        for (const clusterId of sortedClusters) {
+          traces.push(buildSingleTrace(grouped.get(clusterId), clusterId));
+        }
+        if (state.clusterCentroids.length) {
+          traces.push(buildClusterCentroidTrace());
+        }
+        return traces;
+      }
+
+      function buildClusterCentroidTrace() {
+        const centroids = state.clusterCentroids;
+        const x = centroids.map((point) => point[0]);
+        const y = centroids.map((point) => point[1]);
+        const z = centroids.map((point) => point[2]);
+        return {
+          type: "scatter3d",
+          mode: "markers+text",
+          name: "Cluster centers",
+          x,
+          y,
+          z,
+          text: centroids.map((_, index) => `C${index + 1}`),
+          textposition: "top center",
+          textfont: { size: 12, color: "#ffffff" },
+          marker: {
+            symbol: "diamond",
+            size: 12,
+            color: "#ffffff",
+            opacity: 0.95,
+            line: { width: 2, color: "#111827" },
+          },
+          hovertemplate: "<b>%{text}</b><br>x=%{x}<br>y=%{y}<br>z=%{z}<extra></extra>",
+        };
+      }
+
+      function buildSingleTrace(visibleIndex, clusterId) {
+        const xSpec = APP.columns[state.x];
+        const ySpec = APP.columns[state.y];
+        const zSpec = APP.columns[state.z];
+        const labelSpec = state.label ? APP.columns[state.label] : null;
+        const sizeSpec = state.size ? APP.columns[state.size] : null;
+        const colorSpec = state.color && !state.clusterEnabled ? APP.columns[state.color] : null;
+        const colorMeta = state.color && !state.clusterEnabled ? metaByName[state.color] : null;
+        const sizeMeta = state.size ? metaByName[state.size] : null;
+
+        const x = [];
+        const y = [];
+        const z = [];
+        const text = [];
+        const customdata = [];
+        const markerColor = [];
+        const markerSize = [];
+
+        const categoryMap = new Map();
+        const numericSizeMin = sizeMeta && sizeMeta.kind === "numeric" ? sizeMeta.min : null;
+        const numericSizeMax = sizeMeta && sizeMeta.kind === "numeric" ? sizeMeta.max : null;
+
+        for (const rowIndex of visibleIndex) {
+          x.push(xSpec.data[rowIndex]);
+          y.push(ySpec.data[rowIndex]);
+          z.push(zSpec.data[rowIndex]);
+          customdata.push(rowIndex);
+          text.push(labelSpec ? coerceDisplayValue(getValue(state.label, rowIndex)) : "");
+
+          if (colorSpec) {
+            if (colorMeta.kind === "numeric") {
+              markerColor.push(colorSpec.data[rowIndex]);
+            } else {
+              const raw = coerceDisplayValue(getValue(state.color, rowIndex)) || "∅";
+              if (!categoryMap.has(raw)) {
+                categoryMap.set(raw, COLORS[categoryMap.size % COLORS.length]);
+              }
+              markerColor.push(categoryMap.get(raw));
+            }
+          }
+
+          if (sizeSpec && sizeMeta.kind === "numeric") {
+            const value = sizeSpec.data[rowIndex];
+            markerSize.push(scaleSizeValue(value, numericSizeMin, numericSizeMax, state.sizeScale));
+          }
+        }
+
+        const marker = {
+          size: markerSize.length ? markerSize : 4.8 * state.sizeScale,
+          opacity: state.opacity,
+          line: { width: POINT_STYLES[state.pointStyle].lineWidth, color: POINT_STYLES[state.pointStyle].lineColor },
+          symbol: POINT_STYLES[state.pointStyle].symbol,
+        };
+
+        if (clusterId != null) {
+          marker.color = COLORS[clusterId % COLORS.length];
+          marker.line.width = Math.max(marker.line.width, 1.1);
+        } else if (colorSpec) {
+          marker.color = markerColor;
+          if (colorMeta.kind === "numeric") {
+            marker.colorscale = "Turbo";
+            marker.showscale = true;
+            marker.colorbar = {
+              title: state.color,
+              bgcolor: "rgba(7, 14, 24, 0.68)",
+              tickfont: { color: "#edf5ff" },
+              titlefont: { color: "#edf5ff" },
+            };
+          }
+        } else {
+          marker.color = "#48d5b2";
+        }
+
+        return {
+          type: "scatter3d",
+          mode: "markers",
+          name: clusterId == null ? "points" : `Cluster ${clusterId + 1}`,
+          showlegend: clusterId != null,
+          x,
+          y,
+          z,
+          text,
+          customdata,
+          hovertemplate: buildHoverTemplate(),
+          marker,
+        };
+      }
+
+      function buildLayout() {
+        const theme = THEMES[state.theme] || THEMES.nebula;
+        const paperBackground = state.theme === "paper" ? "rgba(255,255,255,0)" : "rgba(0,0,0,0)";
+        const sceneBase = {
+          xaxis: axisLayout(state.x),
+          yaxis: axisLayout(state.y),
+          zaxis: axisLayout(state.z),
+          camera: state.camera || undefined,
+          bgcolor: "rgba(0,0,0,0)",
+        };
+
+        return {
+          paper_bgcolor: paperBackground,
+          plot_bgcolor: paperBackground,
+          margin: { l: 0, r: 0, t: 0, b: 0 },
+          hoverlabel: {
+            bgcolor: theme.hoverBg,
+            bordercolor: theme.accent,
+            font: { family: "IBM Plex Mono, monospace", size: 12, color: theme.text },
+          },
+          scene: sceneBase,
+          legend: {
+            bgcolor: "rgba(0,0,0,0)",
+            font: { color: theme.text },
+          },
+          showlegend: state.clusterEnabled,
+          uirevision: `${state.x}|${state.y}|${state.z}|${state.color}|${state.size}|${state.label}`,
+        };
+      }
+
+      function buildConfig() {
+        const preset = FIGURE_PRESETS[state.figurePreset] || FIGURE_PRESETS.default;
+        const export3d = preset.export3d || FIGURE_PRESETS.default.export3d;
+        return {
+          responsive: true,
+          displaylogo: false,
+          scrollZoom: true,
+          toImageButtonOptions: {
+            format: "png",
+            filename: sanitizeFileStem(APP.sourceName) + "_3d",
+            width: export3d.width,
+            height: export3d.height,
+            scale: export3d.scale,
+          },
+          modeBarButtonsToRemove: ["toImage"],
+        };
+      }
+
+      function axisLayout(name) {
+        const theme = THEMES[state.theme] || THEMES.nebula;
+        return {
+          title: name,
+          color: theme.axisColor,
+          gridcolor: theme.gridColor,
+          zerolinecolor: theme.zeroColor,
+          showbackground: true,
+          backgroundcolor: theme.sceneBg,
+          titlefont: { family: "Space Grotesk, sans-serif", size: 13, color: theme.text },
+        };
+      }
+
+      function applyTheme(themeName) {
+        const theme = THEMES[themeName] || THEMES.nebula;
+        const root = document.documentElement;
+        root.style.setProperty("--accent", theme.accent);
+        root.style.setProperty("--accent-2", theme.accent2);
+        root.style.setProperty("--text", theme.text);
+        root.style.setProperty("--muted", theme.muted);
+        root.style.setProperty("--panel", theme.panel || DEFAULT_THEME_VARS.panel);
+        root.style.setProperty("--panel-strong", theme.panelStrong || DEFAULT_THEME_VARS.panelStrong);
+        root.style.setProperty("--line", theme.line || DEFAULT_THEME_VARS.line);
+        root.style.setProperty("--shadow", theme.shadow || DEFAULT_THEME_VARS.shadow);
+        root.style.setProperty("--plot-shell-bg", theme.sceneBg ? `linear-gradient(180deg, ${theme.sceneBg}, ${theme.sceneBg})` : "var(--plot-shell-bg)");
+        root.style.setProperty("--control-bg", themeName === "paper" ? "rgba(255,255,255,0.76)" : "rgba(4, 10, 17, 0.6)");
+        document.body.style.background = theme.bodyBackground;
+      }
+
+      function normalizeClusterK(rawValue) {
+        const numeric = Number(rawValue);
+        if (!Number.isFinite(numeric)) {
+          return 4;
+        }
+        return Math.max(2, Math.min(12, Math.round(numeric)));
+      }
+
+      function runClustering() {
+        const visible = state.visibleIndex.length ? state.visibleIndex : getVisibleIndexCached();
+        if (visible.length < 8) {
+          elements.clusterStatus.textContent = "need at least 8 points";
+          return;
+        }
+        state.clusterK = Math.min(normalizeClusterK(elements.clusterKInput.value), visible.length - 1);
+        elements.clusterKInput.value = String(state.clusterK);
+
+        const cacheKey = buildClusterKey(visible, state.clusterK);
+        if (clusterCachePayload && clusterCacheKey === cacheKey) {
+          applyClusterResult(
+            visible,
+            clusterCachePayload.assignments,
+            clusterCachePayload.centroids,
+            clusterCachePayload.trainCount,
+            clusterCachePayload.inertia,
+            clusterCachePayload.counts,
+            clusterCachePayload.silhouette,
+            true
+          );
+          return;
+        }
+
+        const coords = new Array(visible.length);
+        const xSpec = APP.columns[state.x].data;
+        const ySpec = APP.columns[state.y].data;
+        const zSpec = APP.columns[state.z].data;
+        for (let i = 0; i < visible.length; i += 1) {
+          const row = visible[i];
+          coords[i] = [xSpec[row], ySpec[row], zSpec[row]];
+        }
+
+        const normalized = normalizeCoordinates(coords);
+        const trainingIndices = sampleIndices(visible.length, CLUSTER_MAX_TRAIN_POINTS, 20260310 + visible.length + state.clusterK);
+        const trainingPoints = trainingIndices.map((idx) => normalized.points[idx]);
+
+        const result = kmeans(trainingPoints, state.clusterK, 22, 20260310);
+        if (!result || !result.assignments.length) {
+          elements.clusterStatus.textContent = "failed";
+          return;
+        }
+
+        const assignments = new Array(normalized.points.length);
+        let inertia = 0;
+        for (let i = 0; i < visible.length; i += 1) {
+          const clusterId = nearestCentroid(normalized.points[i], result.centroids);
+          assignments[i] = clusterId;
+          inertia += squaredDistance(normalized.points[i], result.centroids[clusterId]);
+        }
+        const centroidsRaw = denormalizeCentroids(result.centroids, normalized.stats);
+        const counts = summarizeClusterCounts(assignments, state.clusterK);
+        const silhouette = estimateSilhouette(normalized.points, assignments, state.clusterK, 420, 20260310 + state.clusterK);
+
+        clusterCacheKey = cacheKey;
+        clusterCachePayload = {
+          assignments,
+          centroids: centroidsRaw,
+          trainCount: trainingPoints.length,
+          inertia,
+          counts,
+          silhouette,
+        };
+
+        applyClusterResult(visible, assignments, centroidsRaw, trainingPoints.length, inertia, counts, silhouette, false);
+      }
+
+      function clearClustering(repaint = true) {
+        state.clusterEnabled = false;
+        state.clusterAssignments = new Map();
+        state.clusterRowIds = [];
+        state.clusterCentroids = [];
+        state.clusterTrainCount = 0;
+        state.clusterInertia = null;
+        state.clusterSilhouette = null;
+        state.clusterCounts = [];
+        elements.clusterStatus.textContent = "off";
+        if (repaint) {
+          render();
+        }
+      }
+
+      function applyClusterResult(visible, assignments, centroidsRaw, trainCount, inertia, counts, silhouette, fromCache) {
+        state.clusterAssignments = new Map();
+        state.clusterRowIds = visible.slice();
+        state.clusterCentroids = centroidsRaw;
+        state.clusterTrainCount = trainCount;
+        state.clusterInertia = inertia;
+        state.clusterCounts = counts || [];
+        state.clusterSilhouette = silhouette;
+        for (let i = 0; i < visible.length; i += 1) {
+          state.clusterAssignments.set(visible[i], assignments[i]);
+        }
+        state.clusterEnabled = true;
+        const mode = fromCache ? "cached" : "ready";
+        elements.clusterStatus.textContent = `${state.clusterAlgo} k=${state.clusterK} (${mode}, train ${formatCount(trainCount)}/${formatCount(visible.length)})`;
+        render();
+      }
+
+      function kmeans(points, k, maxIter, seed) {
+        if (!points.length || k <= 1) {
+          return null;
+        }
+
+        const random = seededRandom(seed);
+        const centroids = [];
+        const first = Math.floor(random() * points.length);
+        centroids.push(points[first].slice());
+
+        while (centroids.length < k) {
+          const distances = points.map((point) => minSquaredDistance(point, centroids));
+          const total = distances.reduce((sum, value) => sum + value, 0);
+          if (!Number.isFinite(total) || total <= 0) {
+            centroids.push(points[Math.floor(random() * points.length)].slice());
+            continue;
+          }
+          let threshold = random() * total;
+          let picked = points[0];
+          for (let i = 0; i < points.length; i += 1) {
+            threshold -= distances[i];
+            if (threshold <= 0) {
+              picked = points[i];
+              break;
+            }
+          }
+          centroids.push(picked.slice());
+        }
+
+        const assignments = new Array(points.length).fill(0);
+        for (let iter = 0; iter < maxIter; iter += 1) {
+          let changed = false;
+          for (let i = 0; i < points.length; i += 1) {
+            const nextCluster = nearestCentroid(points[i], centroids);
+            if (assignments[i] !== nextCluster) {
+              changed = true;
+              assignments[i] = nextCluster;
+            }
+          }
+
+          const sums = new Array(k).fill(null).map(() => [0, 0, 0]);
+          const counts = new Array(k).fill(0);
+          for (let i = 0; i < points.length; i += 1) {
+            const cluster = assignments[i];
+            const point = points[i];
+            sums[cluster][0] += point[0];
+            sums[cluster][1] += point[1];
+            sums[cluster][2] += point[2];
+            counts[cluster] += 1;
+          }
+          for (let c = 0; c < k; c += 1) {
+            if (counts[c] === 0) {
+              centroids[c] = points[Math.floor(random() * points.length)].slice();
+              continue;
+            }
+            centroids[c][0] = sums[c][0] / counts[c];
+            centroids[c][1] = sums[c][1] / counts[c];
+            centroids[c][2] = sums[c][2] / counts[c];
+          }
+
+          if (!changed) {
+            break;
+          }
+        }
+
+        return { assignments, centroids };
+      }
+
+      function minSquaredDistance(point, centroids) {
+        let best = Number.POSITIVE_INFINITY;
+        for (const centroid of centroids) {
+          const dist = squaredDistance(point, centroid);
+          if (dist < best) {
+            best = dist;
+          }
+        }
+        return best;
+      }
+
+      function nearestCentroid(point, centroids) {
+        let best = 0;
+        let bestDist = Number.POSITIVE_INFINITY;
+        for (let i = 0; i < centroids.length; i += 1) {
+          const dist = squaredDistance(point, centroids[i]);
+          if (dist < bestDist) {
+            bestDist = dist;
+            best = i;
+          }
+        }
+        return best;
+      }
+
+      function squaredDistance(left, right) {
+        const dx = left[0] - right[0];
+        const dy = left[1] - right[1];
+        const dz = left[2] - right[2];
+        return dx * dx + dy * dy + dz * dz;
+      }
+
+      function seededRandom(seed) {
+        let stateValue = seed >>> 0;
+        return () => {
+          stateValue = (1664525 * stateValue + 1013904223) >>> 0;
+          return stateValue / 4294967296;
+        };
+      }
+
+      function computeVisibleIndex() {
+        const xSpec = APP.columns[state.x];
+        const ySpec = APP.columns[state.y];
+        const zSpec = APP.columns[state.z];
+        const xMin = readRangeInput(elements.xMinInput);
+        const xMax = readRangeInput(elements.xMaxInput);
+        const yMin = readRangeInput(elements.yMinInput);
+        const yMax = readRangeInput(elements.yMaxInput);
+        const zMin = readRangeInput(elements.zMinInput);
+        const zMax = readRangeInput(elements.zMaxInput);
+        const visible = [];
+
+        for (let rowIndex = 0; rowIndex < APP.sampledRowCount; rowIndex += 1) {
+          const x = xSpec.data[rowIndex];
+          const y = ySpec.data[rowIndex];
+          const z = zSpec.data[rowIndex];
+          if (x == null || y == null || z == null) {
+            continue;
+          }
+          if (xMin != null && x < xMin) {
+            continue;
+          }
+          if (xMax != null && x > xMax) {
+            continue;
+          }
+          if (yMin != null && y < yMin) {
+            continue;
+          }
+          if (yMax != null && y > yMax) {
+            continue;
+          }
+          if (zMin != null && z < zMin) {
+            continue;
+          }
+          if (zMax != null && z > zMax) {
+            continue;
+          }
+          if (state.filterColumn && state.selectedCategories.size > 0) {
+            const value = coerceDisplayValue(getValue(state.filterColumn, rowIndex));
+            if (!state.selectedCategories.has(value)) {
+              continue;
+            }
+          }
+          if (state.searchText && state.label) {
+            const searchValue = coerceDisplayValue(getValue(state.label, rowIndex)).toLowerCase();
+            if (!searchValue.includes(state.searchText)) {
+              continue;
+            }
+          }
+          if (state.brushedRows.size > 0 && !state.brushedRows.has(rowIndex)) {
+            continue;
+          }
+          visible.push(rowIndex);
+        }
+        return visible;
+      }
+
+      function getVisibleIndexCached() {
+        const key = buildVisibilityKey();
+        if (visibleCacheKey === key) {
+          return visibleCacheIndex.slice();
+        }
+        const visible = computeVisibleIndex();
+        visibleCacheKey = key;
+        visibleCacheIndex = visible;
+        return visible.slice();
+      }
+
+      function buildVisibilityKey() {
+        const selectedCategories = Array.from(state.selectedCategories).sort().join("|");
+        const brushed = Array.from(state.brushedRows).sort((a, b) => a - b);
+        const brushSignature = brushed.length
+          ? `${brushed.length}:${brushed.slice(0, 16).join(",")}:${brushed[brushed.length - 1]}`
+          : "none";
+        return [
+          state.x,
+          state.y,
+          state.z,
+          state.filterColumn,
+          selectedCategories,
+          state.label,
+          state.searchText,
+          elements.xMinInput.value,
+          elements.xMaxInput.value,
+          elements.yMinInput.value,
+          elements.yMaxInput.value,
+          elements.zMinInput.value,
+          elements.zMaxInput.value,
+          brushSignature,
+        ].join("::");
+      }
+
+      function buildClusterKey(visible, k) {
+        const sample = [];
+        const stride = Math.max(1, Math.floor(visible.length / 24));
+        for (let i = 0; i < visible.length; i += stride) {
+          sample.push(visible[i]);
+        }
+        sample.push(visible[visible.length - 1]);
+        return [state.clusterAlgo, state.x, state.y, state.z, k, visible.length, sample.join(",")].join("::");
+      }
+
+      function refreshCategoryOptions(selectAllWhenEmpty) {
+        elements.categoryValuesSelect.innerHTML = "";
+        if (!state.filterColumn) {
+          elements.categoryValuesSelect.disabled = true;
+          return;
+        }
+
+        elements.categoryValuesSelect.disabled = false;
+        const search = elements.categorySearchInput.value.trim().toLowerCase();
+        const uniqueValues = getUniqueValues(state.filterColumn).filter((value) => value.toLowerCase().includes(search));
+        const shouldAutoSelect = selectAllWhenEmpty && state.selectedCategories.size === 0 && uniqueValues.length <= 18;
+
+        uniqueValues.forEach((value) => {
+          const option = document.createElement("option");
+          option.value = value;
+          option.textContent = value;
+          option.selected = shouldAutoSelect || state.selectedCategories.has(value);
+          elements.categoryValuesSelect.appendChild(option);
+        });
+
+        state.selectedCategories = new Set(
+          Array.from(elements.categoryValuesSelect.selectedOptions).map((option) => option.value)
+        );
+      }
+
+      function getUniqueValues(columnName) {
+        if (uniqueValueCache.has(columnName)) {
+          return uniqueValueCache.get(columnName);
+        }
+
+        const spec = APP.columns[columnName];
+        let values;
+        if (spec.encoding === "dictionary") {
+          values = spec.values.map((value) => coerceDisplayValue(value));
+        } else {
+          values = Array.from(new Set(spec.data.map((value) => coerceDisplayValue(value))));
+        }
+        values = values.filter((value) => value.length > 0).sort((left, right) => left.localeCompare(right));
+        uniqueValueCache.set(columnName, values);
+        return values;
+      }
+
+      function syncAxisRangeInputs(axisKey) {
+        const columnName = state[axisKey];
+        const meta = metaByName[columnName];
+        const minInput = elements[`${axisKey}MinInput`];
+        const maxInput = elements[`${axisKey}MaxInput`];
+        const hint = elements[`${axisKey}RangeHint`];
+
+        minInput.value = meta.min ?? "";
+        maxInput.value = meta.max ?? "";
+        hint.textContent = `${formatCompact(meta.min)} to ${formatCompact(meta.max)}`;
+      }
+
+      function renderDetail(rowIndex) {
+        if (rowIndex == null || rowIndex >= APP.sampledRowCount) {
+          elements.detailContent.innerHTML = `<div class="empty-state">Click any point in the 3D plot to inspect its raw row values.</div>`;
+          fitDetailPanelsToViewport();
+          return;
+        }
+
+        const rows = APP.columnOrder.map((columnName) => {
+          const value = coerceDisplayValue(getValue(columnName, rowIndex));
+          return `<tr><th>${escapeHtml(columnName)}</th><td>${escapeHtml(value)}</td></tr>`;
+        });
+        elements.detailContent.innerHTML = `<table><tbody>${rows.join("")}</tbody></table>`;
+        fitDetailPanelsToViewport();
+      }
+
+      function renderLinked2dPlot() {
+        if (!elements.linked2dPlot || !window.Plotly) {
+          return;
+        }
+        const xSpec = APP.columns[state.x];
+        const ySpec = APP.columns[state.y];
+        const x = [];
+        const y = [];
+        const customdata = [];
+        for (const rowIndex of state.visibleIndex) {
+          x.push(xSpec.data[rowIndex]);
+          y.push(ySpec.data[rowIndex]);
+          customdata.push(rowIndex);
+        }
+        const selectedpoints = [];
+        for (let i = 0; i < customdata.length; i += 1) {
+          if (state.brushedRows.has(customdata[i])) {
+            selectedpoints.push(i);
+          }
+        }
+        const trace = {
+          type: "scattergl",
+          mode: "markers",
+          x,
+          y,
+          customdata,
+          selectedpoints: selectedpoints.length ? selectedpoints : null,
+          marker: {
+            size: 4.5,
+            color: "#59a0ff",
+            opacity: 0.72,
+          },
+          selected: { marker: { color: "#ffd43b", size: 6.8, opacity: 0.95 } },
+          unselected: { marker: { opacity: 0.25 } },
+          hovertemplate: `<b>${escapeHtml(state.x)}</b>: %{x}<br><b>${escapeHtml(state.y)}</b>: %{y}<extra></extra>`,
+        };
+        Plotly.react(
+          elements.linked2dPlot,
+          [trace],
+          {
+            margin: { l: 36, r: 14, t: 12, b: 34 },
+            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: "rgba(0,0,0,0)",
+            xaxis: { title: state.x, zeroline: false },
+            yaxis: { title: state.y, zeroline: false },
+            dragmode: "lasso",
+          },
+          { displayModeBar: false, responsive: true }
+        ).then(bindLinked2dEvents);
+      }
+
+      function bindLinked2dEvents() {
+        if (linked2dEventsBound || typeof elements.linked2dPlot.on !== "function") {
+          return;
+        }
+        linked2dEventsBound = true;
+        elements.linked2dPlot.on("plotly_selected", (event) => {
+          const points = event?.points || [];
+          if (!points.length) {
+            state.brushedRows = new Set();
+          } else {
+            state.brushedRows = new Set(points.map((point) => point.customdata).filter((value) => value != null));
+          }
+          render();
+        });
+        elements.linked2dPlot.on("plotly_click", (event) => {
+          const point = event?.points?.[0];
+          if (point?.customdata == null) {
+            return;
+          }
+          state.brushedRows = new Set([point.customdata]);
+          state.lastClickedRow = point.customdata;
+          renderDetail(point.customdata);
+          render();
+        });
+      }
+
+      function renderClusterAnalytics() {
+        if (!elements.clusterAnalytics) {
+          return;
+        }
+        if (!state.clusterEnabled) {
+          elements.clusterAnalytics.innerHTML = `<div class="empty-state">Run clustering to view cluster analytics.</div>`;
+          return;
+        }
+        const rows = state.clusterCounts.length
+          ? state.clusterCounts
+              .map((count, idx) => `<tr><th>Cluster ${idx + 1}</th><td>${formatCount(count)}</td></tr>`)
+              .join("")
+          : "<tr><th>Clusters</th><td>n/a</td></tr>";
+        elements.clusterAnalytics.innerHTML = `
+          <table>
+            <tbody>
+              <tr><th>Algorithm</th><td>${escapeHtml(state.clusterAlgo)}</td></tr>
+              <tr><th>K</th><td>${formatCount(state.clusterK)}</td></tr>
+              <tr><th>Train points</th><td>${formatCount(state.clusterTrainCount)}</td></tr>
+              <tr><th>Inertia</th><td>${formatCompact(state.clusterInertia)}</td></tr>
+              <tr><th>Silhouette (sample)</th><td>${formatCompact(state.clusterSilhouette)}</td></tr>
+              ${rows}
+            </tbody>
+          </table>
+        `;
+      }
+
+      function updateRenderStatus() {
+        const samplePct = APP.rowCount > 0 ? ((APP.sampledRowCount / APP.rowCount) * 100).toFixed(1) : "0.0";
+        const visiblePct = APP.sampledRowCount > 0 ? ((state.visibleIndex.length / APP.sampledRowCount) * 100).toFixed(1) : "0.0";
+        const clusterDetail = state.clusterEnabled
+          ? `${state.clusterAlgo} (k=${state.clusterK}, train ${formatCount(state.clusterTrainCount)}, inertia ${formatCompact(state.clusterInertia)})`
+          : "off";
+        elements.renderStatus.innerHTML = `
+          <div class="summary-grid">
+            <div class="info-card">
+              <div class="muted">Embedded share</div>
+              <strong>${samplePct}%</strong>
+            </div>
+            <div class="info-card">
+              <div class="muted">Visible share</div>
+              <strong>${visiblePct}%</strong>
+            </div>
+            <div class="info-card">
+              <div class="muted">Filter column</div>
+              <strong>${escapeHtml(state.filterColumn || "none")}</strong>
+            </div>
+            <div class="info-card">
+              <div class="muted">Search column</div>
+              <strong>${escapeHtml(state.label || "none")}</strong>
+            </div>
+            <div class="info-card">
+              <div class="muted">Cluster mode</div>
+              <strong>${escapeHtml(clusterDetail)}</strong>
+            </div>
+            <div class="info-card">
+              <div class="muted">Point style</div>
+              <strong>${escapeHtml(state.pointStyle)}</strong>
+            </div>
+            <div class="info-card">
+              <div class="muted">Brush size</div>
+              <strong>${formatCount(state.brushedRows.size)}</strong>
+            </div>
+            <div class="info-card">
+              <div class="muted">Figure preset</div>
+              <strong>${escapeHtml(state.figurePreset)}</strong>
+            </div>
+          </div>
+        `;
+      }
+
+      function saveCurrentCamera() {
+        const scene = elements.plot && elements.plot._fullLayout && elements.plot._fullLayout.scene;
+        if (!scene || !scene.camera) {
+          elements.cameraStatus.textContent = "Camera unavailable";
+          return;
+        }
+        state.camera = scene.camera;
+        localStorage.setItem(storageKey, JSON.stringify(scene.camera));
+        elements.cameraStatus.textContent = "Camera saved";
+      }
+
+      function resetCamera() {
+        state.camera = null;
+        localStorage.removeItem(storageKey);
+        elements.cameraStatus.textContent = "Camera reset";
+        render();
+      }
+
+      function loadSavedCamera() {
+        try {
+          const raw = localStorage.getItem(storageKey);
+          return raw ? JSON.parse(raw) : null;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function savePlotHeight(height) {
+        if (!Number.isFinite(height)) {
+          return;
+        }
+        localStorage.setItem(plotHeightStorageKey, String(Math.round(height)));
+      }
+
+      function loadSavedPlotHeight() {
+        try {
+          const raw = localStorage.getItem(plotHeightStorageKey);
+          if (!raw) {
+            return null;
+          }
+          const numeric = Number(raw);
+          return Number.isFinite(numeric) ? numeric : null;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function clearSavedPlotHeight() {
+        localStorage.removeItem(plotHeightStorageKey);
+      }
+
+      function saveSideWidth(width) {
+        if (!Number.isFinite(width)) {
+          return;
+        }
+        localStorage.setItem(sideWidthStorageKey, String(Math.round(width)));
+      }
+
+      function loadSavedSideWidth() {
+        try {
+          const raw = localStorage.getItem(sideWidthStorageKey);
+          if (!raw) {
+            return null;
+          }
+          const numeric = Number(raw);
+          return Number.isFinite(numeric) ? numeric : null;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function clearSavedSideWidth() {
+        localStorage.removeItem(sideWidthStorageKey);
+      }
+
+      function exportVisibleCsv() {
+        const lines = [APP.columnOrder.map(csvEscape).join(",")];
+        for (const rowIndex of state.visibleIndex) {
+          const row = APP.columnOrder.map((columnName) => csvEscape(coerceDisplayValue(getValue(columnName, rowIndex))));
+          lines.push(row.join(","));
+        }
+        const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${APP.sourceName.replace(/\.[^.]+$/, "")}.visible.csv`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      async function export3dPng() {
+        if (!state.visibleIndex.length) {
+          elements.cameraStatus.textContent = "No visible points";
+          return;
+        }
+        const preset = FIGURE_PRESETS[state.figurePreset] || FIGURE_PRESETS.default;
+        const export3d = preset.export3d || FIGURE_PRESETS.default.export3d;
+        try {
+          const dataUrl = await Plotly.toImage(elements.plot, {
+            format: "png",
+            width: export3d.width,
+            height: export3d.height,
+            scale: export3d.scale,
+          });
+          triggerDataUrlDownload(dataUrl, `${sanitizeFileStem(APP.sourceName)}_3d_highres.png`);
+          elements.cameraStatus.textContent = "3D PNG exported";
+        } catch (error) {
+          elements.cameraStatus.textContent = "3D PNG export failed";
+        }
+      }
+
+      async function exportQuadrantsPng() {
+        if (!state.visibleIndex.length) {
+          elements.cameraStatus.textContent = "No visible points";
+          return;
+        }
+        const tempPlot = document.createElement("div");
+        tempPlot.style.position = "fixed";
+        tempPlot.style.left = "-10000px";
+        tempPlot.style.top = "-10000px";
+        tempPlot.style.width = "2400px";
+        tempPlot.style.height = "2400px";
+        document.body.appendChild(tempPlot);
+
+        try {
+          const xValues = state.visibleIndex.map((row) => APP.columns[state.x].data[row]).filter((v) => v != null);
+          const yValues = state.visibleIndex.map((row) => APP.columns[state.y].data[row]).filter((v) => v != null);
+          const xPivot = medianOf(xValues);
+          const yPivot = medianOf(yValues);
+          const xMin = Math.min(...xValues);
+          const xMax = Math.max(...xValues);
+          const yMin = Math.min(...yValues);
+          const yMax = Math.max(...yValues);
+
+          const quadrants = [
+            { name: "Q1 (+,+)", rule: (x, y) => x >= xPivot && y >= yPivot },
+            { name: "Q2 (-,+)", rule: (x, y) => x < xPivot && y >= yPivot },
+            { name: "Q3 (-,-)", rule: (x, y) => x < xPivot && y < yPivot },
+            { name: "Q4 (+,-)", rule: (x, y) => x >= xPivot && y < yPivot },
+          ];
+
+          const traces = quadrants.map((quadrant, index) => {
+            const x = [];
+            const y = [];
+            for (const row of state.visibleIndex) {
+              const xValue = APP.columns[state.x].data[row];
+              const yValue = APP.columns[state.y].data[row];
+              if (xValue == null || yValue == null || !quadrant.rule(xValue, yValue)) {
+                continue;
+              }
+              x.push(xValue);
+              y.push(yValue);
+            }
+            return {
+              type: "scattergl",
+              mode: "markers",
+              x,
+              y,
+              marker: {
+                color: COLORS[index % COLORS.length],
+                size: 5.4 * state.sizeScale,
+                opacity: Math.min(1, state.opacity + 0.05),
+              },
+              xaxis: index % 2 === 0 ? "x" : "x2",
+              yaxis: index < 2 ? "y" : "y2",
+              name: quadrant.name,
+              showlegend: false,
+            };
+          });
+
+          const theme = THEMES[state.theme] || THEMES.nebula;
+          const figureFontColor = "#1a2738";
+          await Plotly.newPlot(
+            tempPlot,
+            traces,
+            {
+              grid: { rows: 2, columns: 2, pattern: "independent" },
+              title: `${APP.title} • 2D Quadrants (${state.x} vs ${state.y})`,
+              paper_bgcolor: "white",
+              plot_bgcolor: "white",
+              font: { color: figureFontColor },
+              xaxis: { title: `${state.x} Q1`, zeroline: false, range: [xPivot, xMax] },
+              yaxis: { title: `${state.y} Q1`, zeroline: false, range: [yPivot, yMax] },
+              xaxis2: { title: `${state.x} Q2`, zeroline: false, range: [xMin, xPivot] },
+              yaxis2: { title: `${state.y} Q2`, zeroline: false, range: [yPivot, yMax] },
+              xaxis3: { title: `${state.x} Q3`, zeroline: false, range: [xMin, xPivot] },
+              yaxis3: { title: `${state.y} Q3`, zeroline: false, range: [yMin, yPivot] },
+              xaxis4: { title: `${state.x} Q4`, zeroline: false, range: [xPivot, xMax] },
+              yaxis4: { title: `${state.y} Q4`, zeroline: false, range: [yMin, yPivot] },
+              margin: { l: 80, r: 30, t: 90, b: 70 },
+            },
+            { displaylogo: false, responsive: false }
+          );
+          const dataUrl = await Plotly.toImage(tempPlot, { format: "png", width: 3000, height: 3000, scale: 2 });
+          triggerDataUrlDownload(dataUrl, `${sanitizeFileStem(APP.sourceName)}_2d_quadrants.png`);
+          elements.cameraStatus.textContent = "2D quadrant PNG exported";
+        } catch (error) {
+          elements.cameraStatus.textContent = "2D PNG export failed";
+        } finally {
+          Plotly.purge(tempPlot);
+          tempPlot.remove();
+        }
+      }
+
+      function buildHoverTemplate() {
+        const lines = [
+          `<b>${escapeHtml(state.x)}</b>: %{x}`,
+          `<b>${escapeHtml(state.y)}</b>: %{y}`,
+          `<b>${escapeHtml(state.z)}</b>: %{z}`,
+        ];
+        if (state.label) {
+          lines.push(`<b>${escapeHtml(state.label)}</b>: %{text}`);
+        }
+        return `${lines.join("<br>")}<extra></extra>`;
+      }
+
+      function getValue(columnName, rowIndex) {
+        const spec = APP.columns[columnName];
+        if (spec.encoding === "number") {
+          return spec.data[rowIndex];
+        }
+        if (spec.encoding === "dictionary") {
+          const code = spec.codes[rowIndex];
+          return code == null ? null : spec.values[code];
+        }
+        return spec.data[rowIndex];
+      }
+
+      function scaleSizeValue(value, min, max, scale) {
+        if (value == null || min == null || max == null || min === max) {
+          return 4.8 * scale;
+        }
+        const ratio = Math.max(0, Math.min(1, (value - min) / (max - min)));
+        return (3 + ratio * 10) * scale;
+      }
+
+      function populateSelect(select, values, currentValue, emptyLabel) {
+        select.innerHTML = "";
+        if (emptyLabel) {
+          const option = document.createElement("option");
+          option.value = "";
+          option.textContent = emptyLabel;
+          select.appendChild(option);
+        }
+        values.forEach((value) => {
+          const option = document.createElement("option");
+          option.value = value;
+          option.textContent = value;
+          option.selected = value === currentValue;
+          select.appendChild(option);
+        });
+      }
+
+      function readRangeInput(input) {
+        const value = input.value.trim();
+        if (!value.length) {
+          return null;
+        }
+        const numeric = Number(value);
+        return Number.isFinite(numeric) ? numeric : null;
+      }
+
+      function csvEscape(value) {
+        const text = value == null ? "" : String(value);
+        return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+      }
+
+      function triggerDataUrlDownload(dataUrl, filename) {
+        const link = document.createElement("a");
+        link.href = dataUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      }
+
+      function sanitizeFileStem(filename) {
+        return String(filename || "plot")
+          .replace(/\.[^.]+$/, "")
+          .replace(/[^a-zA-Z0-9._-]+/g, "_")
+          .replace(/^_+|_+$/g, "") || "plot";
+      }
+
+      function medianOf(values) {
+        if (!values.length) {
+          return 0;
+        }
+        const sorted = values.slice().sort((left, right) => left - right);
+        const middle = Math.floor(sorted.length / 2);
+        if (sorted.length % 2 === 0) {
+          return (sorted[middle - 1] + sorted[middle]) / 2;
+        }
+        return sorted[middle];
+      }
+
+      function sampleIndices(totalCount, maxCount, seed) {
+        if (totalCount <= maxCount) {
+          return Array.from({ length: totalCount }, (_, idx) => idx);
+        }
+        const step = Math.ceil(totalCount / maxCount);
+        const offset = Math.max(0, seed % step);
+        const result = [];
+        for (let i = offset; i < totalCount; i += step) {
+          result.push(i);
+          if (result.length >= maxCount) {
+            break;
+          }
+        }
+        if (!result.length) {
+          result.push(0);
+        }
+        return result;
+      }
+
+      function normalizeCoordinates(coords) {
+        const n = coords.length;
+        const sums = [0, 0, 0];
+        const sumsSq = [0, 0, 0];
+        for (let i = 0; i < n; i += 1) {
+          sums[0] += coords[i][0];
+          sums[1] += coords[i][1];
+          sums[2] += coords[i][2];
+          sumsSq[0] += coords[i][0] * coords[i][0];
+          sumsSq[1] += coords[i][1] * coords[i][1];
+          sumsSq[2] += coords[i][2] * coords[i][2];
+        }
+        const means = sums.map((sum) => sum / Math.max(1, n));
+        const stds = sumsSq.map((sumSq, axis) => {
+          const mean = means[axis];
+          const variance = Math.max(0, sumSq / Math.max(1, n) - mean * mean);
+          const std = Math.sqrt(variance);
+          return std > 1e-9 ? std : 1;
+        });
+        const points = coords.map((point) => [
+          (point[0] - means[0]) / stds[0],
+          (point[1] - means[1]) / stds[1],
+          (point[2] - means[2]) / stds[2],
+        ]);
+        return { points, stats: { means, stds } };
+      }
+
+      function denormalizeCentroids(centroids, stats) {
+        return centroids.map((centroid) => [
+          centroid[0] * stats.stds[0] + stats.means[0],
+          centroid[1] * stats.stds[1] + stats.means[1],
+          centroid[2] * stats.stds[2] + stats.means[2],
+        ]);
+      }
+
+      function summarizeClusterCounts(assignments, k) {
+        const counts = new Array(k).fill(0);
+        for (const clusterId of assignments) {
+          if (clusterId != null && clusterId >= 0 && clusterId < k) {
+            counts[clusterId] += 1;
+          }
+        }
+        return counts;
+      }
+
+      function estimateSilhouette(points, assignments, k, sampleLimit, seed) {
+        if (!points.length || !assignments.length || k < 2) {
+          return null;
+        }
+        const groups = new Array(k).fill(null).map(() => []);
+        for (let i = 0; i < assignments.length; i += 1) {
+          const clusterId = assignments[i];
+          if (clusterId != null && clusterId >= 0 && clusterId < k) {
+            groups[clusterId].push(i);
+          }
+        }
+        const candidates = sampleIndices(points.length, Math.min(sampleLimit, points.length), seed);
+        let scoreSum = 0;
+        let used = 0;
+        for (const idx of candidates) {
+          const clusterId = assignments[idx];
+          if (clusterId == null || groups[clusterId].length <= 1) {
+            continue;
+          }
+          const a = averageDistanceToGroup(points, idx, groups[clusterId]);
+          let b = Number.POSITIVE_INFINITY;
+          for (let target = 0; target < k; target += 1) {
+            if (target === clusterId || groups[target].length === 0) {
+              continue;
+            }
+            const dist = averageDistanceToGroup(points, idx, groups[target]);
+            if (dist < b) {
+              b = dist;
+            }
+          }
+          if (!Number.isFinite(a) || !Number.isFinite(b) || (a === 0 && b === 0)) {
+            continue;
+          }
+          scoreSum += (b - a) / Math.max(a, b);
+          used += 1;
+        }
+        return used ? scoreSum / used : null;
+      }
+
+      function averageDistanceToGroup(points, pointIdx, groupIndices) {
+        if (!groupIndices.length) {
+          return Number.POSITIVE_INFINITY;
+        }
+        let sum = 0;
+        let count = 0;
+        for (const idx of groupIndices) {
+          if (idx === pointIdx) {
+            continue;
+          }
+          sum += Math.sqrt(squaredDistance(points[pointIdx], points[idx]));
+          count += 1;
+        }
+        return count ? sum / count : 0;
+      }
+
+      function formatCount(value) {
+        return new Intl.NumberFormat().format(value || 0);
+      }
+
+      function formatCompact(value) {
+        if (value == null) {
+          return "n/a";
+        }
+        return new Intl.NumberFormat(undefined, { maximumFractionDigits: 3 }).format(value);
+      }
+
+      function coerceDisplayValue(value) {
+        if (value == null) {
+          return "";
+        }
+        return String(value);
+      }
+
+      function debounce(fn, wait) {
+        let timeout;
+        return (...args) => {
+          window.clearTimeout(timeout);
+          timeout = window.setTimeout(() => fn(...args), wait);
+        };
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+    </script>
+  </body>
+</html>

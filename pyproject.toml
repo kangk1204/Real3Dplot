@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "three-d-plot-dashboard"
+version = "0.1.0"
+description = "Generate lightweight interactive 3D plot HTML dashboards from Excel, CSV, and TSV files."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "OpenAI Codex" }
+]
+dependencies = [
+  "openpyxl>=3.1.5",
+  "polars>=1.32.0",
+  "xlrd>=2.0.1",
+]
+
+[project.scripts]
+3dplot-dashboard = "three_d_plot_dashboard.cli:main"
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.4.0",
+]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+three_d_plot_dashboard = ["templates/*.html"]
